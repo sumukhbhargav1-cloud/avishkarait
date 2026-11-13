@@ -52,11 +52,20 @@ Do not add the old `avishkarait` remote. `.env.local` and other `.env.*` files a
 
 ## Separate Vercel deployment
 
-Sign in to the **different Vercel account**, import only `sumukh0759T/portal-avishkar`, and configure the new portal URL, publishable key and server-only service-role key plus:
+Sign in to the **different Vercel account** and import only `sumukh0759T/portal-avishkar`. Set the project root to `.` and use the Next.js framework preset; `npm run build` is the build command and Next.js should choose its output directory automatically. Set the production branch to `main`.
 
+Add these project environment variables for Production and Preview, using values from the **new portal Supabase project**:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (server-only; never prefix it with `NEXT_PUBLIC_`)
+- `PORTAL_CREDENTIAL_ENCRYPTION_KEY` (stable base64-encoded 32-byte key; keep the same value across deployments)
 - `NEXT_PUBLIC_APP_URL=https://portal.avishkarait.online`
 - `NEXT_PUBLIC_SITE_DOMAIN=portal.avishkarait.online`
+- `NEXT_PUBLIC_PARTICIPANT_PORTAL_URL=https://portal.avishkarait.online/participant`
 
-Deploy, then add `portal.avishkarait.online` to this new Vercel project's Domains and configure the DNS records Vercel provides. Keep `avishkarait.online` attached to its existing public-site hosting. In the new Supabase project's Auth URL settings, set the production site URL to `https://portal.avishkarait.online` and allow its auth callback paths.
+Apply all Supabase migrations before testing workflows. In the new Supabase project's Auth URL settings, set the production site URL to `https://portal.avishkarait.online` and add `https://portal.avishkarait.online/auth/callback` to the allowed redirect URLs. Add `portal.avishkarait.online` to this new Vercel project's Domains and configure the DNS records Vercel provides. Keep `avishkarait.online` attached to its existing public-site hosting.
+
+After changing Vercel environment variables, start a new deployment because existing deployments do not receive updated values. Once Git is connected, pushes to `main` start production builds. A failed Vercel build should be diagnosed from that deployment's Build Logs; a successful local `npm run build` only verifies the repository build, not project settings or Supabase configuration.
 
 The public website can independently point its Register buttons at `https://portal.avishkarait.online`; no database link is required.
