@@ -1,9 +1,9 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { paymentConfig, type RegistrationDomain } from "@/config/registration-domains";
+import { PUBLIC_WEBSITE_URL } from "@/config/site";
 import { MAX_PAYMENT_PROOF_BYTES, validatePaymentProof, validateRegistrationInput, type RegistrationInput, type RegistrationMemberInput } from "@/lib/registration-validation";
 
 type DomainWithCapacity = RegistrationDomain & { registeredTeams: number; remainingSlots: number; full: boolean };
@@ -119,11 +119,11 @@ export default function RegisterPage() {
   return (
     <main className="registration-page">
       {!success && <header className="registration-topbar">
-        <Link className="brand" href="/" aria-label="AVISHKAR Portal home">
+        <a className="brand" href={PUBLIC_WEBSITE_URL} target="_blank" rel="noreferrer" aria-label="AVISHKAR public website">
           <span className="brand-mark">A<span>.</span></span>
           <span className="brand-copy"><b>AVISHKAR <i>2K26</i></b><small>INNOVATION HACKATHON</small></span>
-        </Link>
-        <Link className="topbar-back" href="/">Portal home <span aria-hidden="true">↗</span></Link>
+        </a>
+        <a className="topbar-back" href={PUBLIC_WEBSITE_URL} target="_blank" rel="noreferrer">Main website <span aria-hidden="true">↗</span></a>
       </header>}
 
       {!success && <section className="registration-hero">

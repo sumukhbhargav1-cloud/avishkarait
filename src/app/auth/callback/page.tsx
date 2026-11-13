@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PUBLIC_WEBSITE_URL } from "@/config/site";
 
 export default function AuthCallbackPage() {
   return (
@@ -8,6 +9,7 @@ export default function AuthCallbackPage() {
         <h1>Email links<br /><span>aren’t used.</span></h1>
         <p className="auth-intro">Use the email address and password provided by an AVISHKAR organiser to sign in.</p>
         <Link className="button button-primary" href="/login">Go to sign in <span aria-hidden="true">↗</span></Link>
+        <p className="auth-switch"><a href={PUBLIC_WEBSITE_URL} target="_blank" rel="noreferrer">Visit the main website ↗</a></p>
       </section>
     </main>
   );

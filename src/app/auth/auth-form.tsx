@@ -1,9 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "../../lib/supabase";
+import { PUBLIC_WEBSITE_URL } from "@/config/site";
 
 export function AuthForm() {
   const [email, setEmail] = useState("");
@@ -35,10 +35,10 @@ export function AuthForm() {
 
   return (
     <main className="auth-shell">
-      <Link className="brand auth-brand" href="/">
+      <a className="brand auth-brand" href={PUBLIC_WEBSITE_URL} target="_blank" rel="noreferrer">
         <span className="brand-mark" aria-hidden="true">A</span>
         <span>AVISHKAR<span className="brand-light"> / PORTAL</span></span>
-      </Link>
+      </a>
       <section className="auth-card">
         <p className="eyebrow"><span className="live-dot" /> SECURE PORTAL ACCESS</p>
         <h1>Welcome<br /><span>back.</span></h1>
@@ -51,7 +51,7 @@ export function AuthForm() {
         {message && <p className="auth-message" role="alert">{message}</p>}
         <p className="auth-switch">Need access? Contact the AVISHKAR organisers.</p>
       </section>
-      <footer className="auth-footer">Independent AVISHKAR participant and admin portal</footer>
+      <footer className="auth-footer"><a href={PUBLIC_WEBSITE_URL} target="_blank" rel="noreferrer">Visit the main website ↗</a><br />Independent AVISHKAR participant and admin portal</footer>
     </main>
   );
 }

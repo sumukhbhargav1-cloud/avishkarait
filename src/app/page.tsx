@@ -1,8 +1,10 @@
+import { PUBLIC_WEBSITE_URL } from "@/config/site";
+
 export default function HomePage() {
   return (
     <main className="page-shell">
       <header className="topbar">
-        <a className="brand" href="/" aria-label="AVISHKAR Portal home">
+        <a className="brand" href={PUBLIC_WEBSITE_URL} target="_blank" rel="noreferrer" aria-label="AVISHKAR public website">
           <span className="brand-mark" aria-hidden="true">A</span>
           <span>AVISHKAR<span className="brand-light"> / PORTAL</span></span>
         </a>
@@ -35,7 +37,7 @@ export default function HomePage() {
 
       <footer className="footer">
         <span>AVISHKAR · INNOVATION STARTS WITH YOU</span>
-        <a href="https://avishkarait.online">Visit the main website <span aria-hidden="true">↗</span></a>
+        <a href={PUBLIC_WEBSITE_URL} target="_blank" rel="noreferrer">Visit the main website <span aria-hidden="true">↗</span></a>
       </footer>
     </main>
   );
