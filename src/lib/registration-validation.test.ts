@@ -53,5 +53,5 @@ test("checks image type, size, and actual PNG signature", async () => {
   const spoofed = new File(["not an image"], "proof.png", { type: "image/png" });
   assert.match((await validatePaymentProof(spoofed)) ?? "", /not a valid/);
   const tooLarge = { size: MAX_PAYMENT_PROOF_BYTES + 1, type: "image/png", arrayBuffer: async () => validPng.arrayBuffer() } as File;
-  assert.match((await validatePaymentProof(tooLarge)) ?? "", /5 MB/);
+  assert.match((await validatePaymentProof(tooLarge)) ?? "", /2 MiB/);
 });
