@@ -1,5 +1,0 @@
-import { NextResponse } from 'next/server';
-import { z } from 'zod';
-import { getAuthenticatedContext } from '@/lib/auth/require-user';
-const schema=z.object({title:z.string().trim().min(2).max(160),body:z.string().trim().min(2).max(10000)});
-export async function POST(request:Request){const {supabase,user,role}=await getAuthenticatedContext();if(!supabase)return NextResponse.json({error:'Supabase is not configured.'},{status:503});if(!user)return NextResponse.json({error:'Sign in required.'},{status:401});if(role!=='admin')return NextResponse.json({error:'Administrator role required.'},{status:403});const parsed=schema.safeParse(await request.json().catch(()=>null));if(!parsed.success)return NextResponse.json({error:'Enter a valid announcement title and message.'},{status:400});const {error}=await supabase.from('announcements').insert({title:parsed.data.title,body:parsed.data.body,audience:['participant','team_leader'],author_id:user.id,published_at:new Date().toISOString()});if(error)return NextResponse.json({error:'Announcement could not be published.'},{status:500});return NextResponse.json({ok:true},{status:201});}

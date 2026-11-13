@@ -38,6 +38,7 @@ export const eventDomains: EventDomain[] = [
     number: '01', code: 'CYB', slug: 'ai-cybersecurity-fintech',
     coordinators: [
       { role: 'Student Coordinator', name: 'Yogin', phone: '+91 6364328712' },
+      { role: 'Faculty Coordinator', name: 'Ms. Nausheen', phone: '+91 8088153093' },
     ],
     name: 'AI in Cybersecurity & FinTech',
     short: 'Intelligent systems built for trust and financial security.',
