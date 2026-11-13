@@ -5,7 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { paymentConfig, type RegistrationDomain } from "@/config/registration-domains";
 import { PUBLIC_WEBSITE_URL } from "@/config/site";
 import { TurnstileChallenge } from "./turnstile-challenge";
-import { MAX_PAYMENT_PROOF_BYTES, validatePaymentProof, validateRegistrationInput, type RegistrationInput, type RegistrationMemberInput } from "@/lib/registration-validation";
+import { AT_EVENT_CHALLENGE_ID, MAX_PAYMENT_PROOF_BYTES, validatePaymentProof, validateRegistrationInput, type RegistrationInput, type RegistrationMemberInput } from "@/lib/registration-validation";
 
 type DomainWithCapacity = RegistrationDomain & { registeredTeams: number; remainingSlots: number; full: boolean };
 type Submission = { success: true; registrationReference: string; domain: string; teamName: string; status: string; paymentStatus: string; registeredTeams: number; remainingSlots: number; teamLeaderPhone?: string };
@@ -41,8 +41,9 @@ export default function RegisterPage() {
         if (active) {
           setDomains(body.domains as DomainWithCapacity[]);
           setSelectedDomainSlug(body.domains?.[0]?.slug ?? "");
-          setChallengeId(body.domains?.[0]?.challenges?.[0]?.id ?? "");
-          const firstMinimum = body.domains?.[0]?.challenges?.[0]?.minimumTeamSize ?? body.domains?.[0]?.minimumTeamSize ?? 1;
+          const firstDomain = body.domains?.[0];
+          setChallengeId(firstDomain?.challengeSelection === "at_event" ? AT_EVENT_CHALLENGE_ID : firstDomain?.challenges?.[0]?.id ?? "");
+          const firstMinimum = firstDomain?.challengeSelection === "at_event" ? firstDomain?.minimumTeamSize ?? 1 : firstDomain?.challenges?.[0]?.minimumTeamSize ?? firstDomain?.minimumTeamSize ?? 1;
           setTeamSize(firstMinimum);
           setMembers(Array.from({ length: Math.max(0, firstMinimum - 1) }, emptyPerson));
         }
@@ -53,21 +54,21 @@ export default function RegisterPage() {
   }, []);
 
   const domain = domains.find((item) => item.slug === selectedDomainSlug);
-  const challenge = domain?.challenges.find((item) => item.id === challengeId) ?? domain?.challenges[0];
+  const challenge = domain?.challengeSelection === "at_event" ? undefined : domain?.challenges.find((item) => item.id === challengeId) ?? domain?.challenges[0];
   const effectiveMin = challenge?.minimumTeamSize ?? domain?.minimumTeamSize ?? 1;
   const effectiveMax = challenge?.maximumTeamSize ?? domain?.maximumTeamSize ?? 4;
   const slotOptions = useMemo(() => Array.from({ length: Math.max(0, effectiveMax - effectiveMin + 1) }, (_, index) => effectiveMin + index), [effectiveMin, effectiveMax]);
 
   function changeDomain(slug: string) {
     const next = domains.find((item) => item.slug === slug);
-    const nextChallenge = next?.challenges[0];
+    const nextChallenge = next?.challengeSelection === "at_event" ? undefined : next?.challenges[0];
     const minimum = nextChallenge?.minimumTeamSize ?? next?.minimumTeamSize ?? 1;
     const maximum = nextChallenge?.maximumTeamSize ?? next?.maximumTeamSize ?? 4;
     setSelectedDomainSlug(slug);
-    setChallengeId(nextChallenge?.id ?? "");
+    setChallengeId(next?.challengeSelection === "at_event" ? AT_EVENT_CHALLENGE_ID : nextChallenge?.id ?? "");
     setTeamSize(minimum);
     setMembers(Array.from({ length: Math.max(0, minimum - 1) }, emptyPerson));
-    if (maximum < minimum) setError("This challenge has no valid team size configured.");
+    if (maximum < minimum) setError("This domain has no valid team size configured.");
   }
 
   function changeChallenge(id: string) {
@@ -96,12 +97,12 @@ export default function RegisterPage() {
     if (honeypot.trim()) { setError("Registration could not be accepted."); return; }
     if (!turnstileSiteKey) { setError("Registration security verification is not configured. Please contact the organisers."); return; }
     if (!turnstileToken) { setError("Complete the anti-spam verification before submitting."); return; }
-    if (!domain || !challenge) { setError("Select a domain and challenge."); return; }
+    if (!domain || (domain.challengeSelection !== "at_event" && !challenge)) { setError("Select a domain and challenge."); return; }
     if (domain.full) { setError("This domain has reached its capacity. Choose another domain."); return; }
     if (!acceptedRules) { setError("Confirm that you have read the selected domain rules."); return; }
     if (!paymentProof) { setError("Upload your payment screenshot."); return; }
 
-    const input: RegistrationInput = { domainSlug: domain.slug, challengeId: challenge.id, teamName, teamSize, acceptedRules, leader, members, utrReference };
+    const input: RegistrationInput = { domainSlug: domain.slug, challengeId: domain.challengeSelection === "at_event" ? AT_EVENT_CHALLENGE_ID : challenge!.id, teamName, teamSize, acceptedRules, leader, members, utrReference };
     const validated = validateRegistrationInput(input);
     if (validated.error) { setError(validated.error); return; }
     const proofError = await validatePaymentProof(paymentProof);
@@ -168,9 +169,9 @@ export default function RegisterPage() {
             </select>
             {domain && <div className="domain-info-card">
               <p>{domain.description}</p>
-              {domain.challenges.length > 1 && <><label className="field-label" htmlFor="challenge">Challenge</label><select id="challenge" className="form-control" value={challengeId} onChange={(event) => changeChallenge(event.target.value)}>{domain.challenges.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select><p className="challenge-description">{challenge?.description}</p></>}
+              {domain.challengeSelection === "at_event" ? <p className="challenge-description">Challenge selection will take place after your team arrives at the event.</p> : domain.challenges.length > 1 && <><label className="field-label" htmlFor="challenge">Challenge</label><select id="challenge" className="form-control" value={challengeId} onChange={(event) => changeChallenge(event.target.value)}>{domain.challenges.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select><p className="challenge-description">{challenge?.description}</p></>}
               <div className="capacity-grid"><div><small>TOTAL CAPACITY</small><strong>{domain.capacity}</strong><span>teams</span></div><div><small>REGISTERED TEAMS</small><strong>{domain.registeredTeams}</strong><span>teams</span></div><div><small>SLOTS REMAINING</small><strong className={domain.remainingSlots <= 3 ? "slots-low" : ""}>{domain.remainingSlots}</strong><span>teams</span></div></div>
-              <div className="rule-list"><h3>Domain rules</h3><ul>{domain.rules.map((rule) => <li key={rule}>{rule}</li>)}</ul>{domain.challenges.length > 1 && <><h3>{challenge?.name} rules</h3><ul>{challenge?.rules.map((rule) => <li key={rule}>{rule}</li>)}</ul></>}</div>
+              <div className="rule-list"><h3>Domain rules</h3><ul>{domain.rules.map((rule) => <li key={rule}>{rule}</li>)}</ul>{domain.challengeSelection !== "at_event" && domain.challenges.length > 1 && <><h3>{challenge?.name} rules</h3><ul>{challenge?.rules.map((rule) => <li key={rule}>{rule}</li>)}</ul></>}</div>
               <div className="coordinator-row"><span>STUDENT COORDINATOR</span><div><a href={`tel:${domain.studentCoordinator.phone.replaceAll(" ", "")}`}>{domain.studentCoordinator.name} · {domain.studentCoordinator.phone}</a></div></div>
               <div className="coordinator-row"><span>FACULTY COORDINATOR</span><div>{domain.facultyCoordinator ? <a href={`tel:${domain.facultyCoordinator.phone.replaceAll(" ", "")}`}>{domain.facultyCoordinator.name} · {domain.facultyCoordinator.phone}</a> : <span>Not listed</span>}</div></div>
               {domain.full && <p className="capacity-full" role="status">This domain is full. New registrations are closed.</p>}

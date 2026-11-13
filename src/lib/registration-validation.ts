@@ -2,6 +2,7 @@ import { registrationDomains, type RegistrationDomain } from "../config/registra
 
 export const MAX_PAYMENT_PROOF_BYTES = 2 * 1024 * 1024;
 export const ALLOWED_PAYMENT_PROOF_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
+export const AT_EVENT_CHALLENGE_ID = "at-event";
 
 export type RegistrationMemberInput = {
   fullName: string;
@@ -31,11 +32,15 @@ export function validateRegistrationInput(value: unknown): { input?: Registratio
   const domain = registrationDomains.find((item) => item.slug === input.domainSlug);
   if (!domain) return { error: "Select a valid domain." };
   if (typeof input.challengeId !== "string") return { error: "Select a challenge." };
-  const challenge = domain.challenges.find((item) => item.id === input.challengeId);
-  if (!challenge) return { error: "Select a valid challenge." };
+  const chooseAtEvent = domain.challengeSelection === "at_event";
+  const challenge = chooseAtEvent ? undefined : domain.challenges.find((item) => item.id === input.challengeId);
+  if (chooseAtEvent ? input.challengeId !== AT_EVENT_CHALLENGE_ID : !challenge) return { error: "Select a valid challenge." };
   if (typeof input.teamName !== "string" || input.teamName.trim().length < 2 || input.teamName.trim().length > 80) return { error: "Team name must be between 2 and 80 characters." };
-  if (!Number.isInteger(input.teamSize) || input.teamSize! < challenge.minimumTeamSize || input.teamSize! > challenge.maximumTeamSize) {
-    return { error: `Team size for ${challenge.name} must be ${challenge.minimumTeamSize === challenge.maximumTeamSize ? challenge.minimumTeamSize : `${challenge.minimumTeamSize} to ${challenge.maximumTeamSize}`} members.` };
+  const minimumTeamSize = challenge?.minimumTeamSize ?? domain.minimumTeamSize;
+  const maximumTeamSize = challenge?.maximumTeamSize ?? domain.maximumTeamSize;
+  if (!Number.isInteger(input.teamSize) || input.teamSize! < minimumTeamSize || input.teamSize! > maximumTeamSize) {
+    const scope = challenge ? ` for ${challenge.name}` : ` for ${domain.name}`;
+    return { error: `Team size${scope} must be ${minimumTeamSize === maximumTeamSize ? minimumTeamSize : `${minimumTeamSize} to ${maximumTeamSize}`} members.` };
   }
   if (input.acceptedRules !== true) return { error: "Confirm that you have read the selected domain rules." };
   if (!input.leader || !Array.isArray(input.members)) return { error: "Enter the team leader and member details." };

@@ -15,6 +15,7 @@ export type RegistrationDomain = {
   rules: string[];
   minimumTeamSize: number;
   maximumTeamSize: number;
+  challengeSelection?: "registration" | "at_event";
   capacity: number;
   studentCoordinator: { name: string; phone: string };
   facultyCoordinator?: { name: string; phone: string };
@@ -125,6 +126,7 @@ export const registrationDomains: RegistrationDomain[] = [
     ],
     minimumTeamSize: 1,
     maximumTeamSize: 4,
+    challengeSelection: "at_event",
     capacity: 20,
     studentCoordinator: { name: "Kishan", phone: "9964127576" },
     facultyCoordinator: { name: "Mr. Praveen", phone: "8762006969" },
@@ -177,9 +179,10 @@ export const registrationDomains: RegistrationDomain[] = [
     code: "CIV",
     name: "THEODO – Civil Engineering & Structural Innovation",
     description: "Apply civil engineering skills to structural design, AutoCAD drafting and field surveying challenges.",
-    rules: ["Choose a challenge; team size and challenge rules vary by challenge."],
+    rules: ["Choose a challenge at the event after arrival; team size is 2 to 4 members."],
     minimumTeamSize: 2,
     maximumTeamSize: 4,
+    challengeSelection: "at_event",
     capacity: 20,
     studentCoordinator: { name: "Rahul", phone: "9110463448" },
     facultyCoordinator: { name: "Mr. Naveen", phone: "+91 95917 93656" },

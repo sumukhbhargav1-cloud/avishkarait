@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { registrationDomains } from "../config/registration-domains.ts";
-import { MAX_PAYMENT_PROOF_BYTES, validatePaymentProof, validateRegistrationInput } from "./registration-validation.ts";
+import { AT_EVENT_CHALLENGE_ID, MAX_PAYMENT_PROOF_BYTES, validatePaymentProof, validateRegistrationInput } from "./registration-validation.ts";
 
 const valid = {
   domainSlug: "full-stack",
@@ -40,9 +40,19 @@ test("rejects team sizes outside the selected challenge range", () => {
   assert.match(result.error ?? "", /Team size/);
 });
 
-test("enforces exact challenge team sizes for THEODO", () => {
+test("rejects challenge selection during THEODO registration", () => {
   const result = validateRegistrationInput({ ...valid, domainSlug: "theodo", challengeId: "cadathon", teamSize: 3, members: [valid.members[0], { fullName: "Extra Member", email: "extra@example.edu", phone: "+919876543211" }] });
-  assert.match(result.error ?? "", /must be 2 members/);
+  assert.match(result.error ?? "", /valid challenge/);
+});
+
+test("accepts THEODO registration without choosing an event challenge", () => {
+  const result = validateRegistrationInput({ ...valid, domainSlug: "theodo", challengeId: AT_EVENT_CHALLENGE_ID, teamSize: 3, members: [valid.members[0], { fullName: "Extra Member", email: "extra@example.edu", phone: "+919876543211" }] });
+  assert.equal(result.error, undefined);
+});
+
+test("accepts MECHSPARK registration without choosing an event challenge", () => {
+  const result = validateRegistrationInput({ ...valid, domainSlug: "mechspark", challengeId: AT_EVENT_CHALLENGE_ID, teamSize: 3, members: [valid.members[0], { fullName: "Extra Member", email: "extra@example.edu", phone: "+919876543211" }] });
+  assert.equal(result.error, undefined);
 });
 
 test("rejects duplicate leader/member email and malformed UTR", () => {
