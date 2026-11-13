@@ -39,7 +39,7 @@ Every admin API verifies the Supabase access token and `profiles.role` on the se
 - RLS is enabled on the database tables. Public clients have no direct read/write grants to registration records.
 - `participant_qr_tokens`, `meal_checkins`, `accommodation_requests`, `admin_audit_log`: private participant and admin workflows. Admin API actions use server-side role checks; participant APIs verify the authenticated team leader.
 
-The schema migrations are `supabase/migrations/202611130001_initial_portal_schema.sql` through `202611130004_accommodation_request_contact.sql`. Apply them only to the new portal project. `supabase/tests/registration_capacity.sql` is a rollback-only SQL integration check for the atomic capacity RPC. Apply all four migrations before using `/admin` or `/participant`. Treat changes to registration and storage access as security-sensitive and review them before deployment.
+The schema migrations are `supabase/migrations/202611130001_initial_portal_schema.sql` through `202611130005_fix_registration_reference_ambiguity.sql`. Apply them only to the new portal project. `supabase/tests/registration_capacity.sql` is a rollback-only SQL integration check for the atomic capacity RPC. Apply all five migrations before using registration, `/admin` or `/participant`. Treat changes to registration and storage access as security-sensitive and review them before deployment.
 
 ## New GitHub repository
 

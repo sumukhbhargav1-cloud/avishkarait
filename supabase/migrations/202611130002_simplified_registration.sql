@@ -158,7 +158,7 @@ begin
     raise exception using errcode = '23505', message = 'One or more team members are already registered in this domain.';
   end if;
 
-  insert into public.registrations (
+  insert into public.registrations as inserted_registration (
     id, event_id, team_leader_id, domain_slug, domain_name, challenge_id,
     team_name, team_size, team_leader_name, team_leader_email, team_leader_phone,
     status, payment_status, utr_reference, payment_proof_path, submitted_at
@@ -166,7 +166,7 @@ begin
     p_registration_id, null, null, p_domain_slug, p_domain_name, p_challenge_id,
     trim(p_team_name), p_team_size, trim(p_leader_name), lower(trim(p_leader_email)), trim(p_leader_phone),
     'payment_pending', 'pending', upper(trim(p_utr_reference)), p_payment_proof_path, now()
-  ) returning registration_reference into v_reference;
+  ) returning inserted_registration.registration_reference into v_reference;
 
   for v_person in select value from jsonb_array_elements(p_members) loop
     insert into public.registration_members (registration_id, full_name, email, phone, domain_slug)
