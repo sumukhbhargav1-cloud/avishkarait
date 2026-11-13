@@ -9,6 +9,12 @@
     "jsx": "react-jsx",
     "strict": true,
     "moduleResolution": "bundler",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
@@ -31,7 +37,9 @@
     "src/**/*",
     ".next/types/**/*",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".build/types/**/*.ts",
+    ".build/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

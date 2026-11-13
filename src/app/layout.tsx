@@ -5,6 +5,8 @@ export const metadata = {
   description: "AVISHKAR Event Registration Portal",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({
   children,
 }: {

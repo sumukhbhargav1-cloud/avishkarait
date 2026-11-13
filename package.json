@@ -4,8 +4,9 @@
   "description": "Independent AVISHKAR participant and registration portal",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "build": "next build --webpack",
+    "start": "next start",
+    "test": "node --experimental-strip-types --test src/lib/registration-validation.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
     "next": "^16.4.6",
+    "qrcode.react": "^4.2.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

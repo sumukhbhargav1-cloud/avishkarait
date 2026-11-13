@@ -7,54 +7,52 @@ An independent participant registration portal for `portal.avishkarait.online`. 
 Requirements: Node.js 20.9+ and npm.
 
 1. Copy `.env.example` to `.env.local`.
-2. Create a **new Supabase project** for this portal and copy its Project URL and publishable/anon key into `.env.local`. Never use credentials from the public site or another Supabase project.
+2. Create a **new Supabase project** for this portal. Set its URL, publishable/anon key, and service-role key in `.env.local`. Keep the service-role key server-only. Never use credentials from the public site or another Supabase project.
 3. Install dependencies with `npm install`.
-4. Apply the migration to the new project with the Supabase CLI: `supabase link --project-ref <NEW_PROJECT_REF>` followed by `supabase db push`.
-5. In the new project's Auth URL configuration, allow `http://localhost:3000` and `https://portal.avishkarait.online`. Choose the email confirmation/OTP behavior for the new portal there.
-6. Run `npm run dev` and open `http://localhost:3000`.
+4. Apply migrations in order to the new project: `supabase link --project-ref <NEW_PROJECT_REF>` followed by `supabase db push`.
+5. Run `npm run dev` and open `http://localhost:3000`.
 
-No event is seeded by the migration. Add portal-owned event records in the new project's SQL editor or through the future admin interface. Event descriptions, rules and team-size limits belong in `public.events`; site/portal configuration belongs in `public.portal_config`. Do not fetch registration-form data from the public website.
+Registration domains, challenge rules, team-size limits, coordinator contacts and the organiser-confirmed capacity of 20 teams per domain are pre-coded in `src/config/registration-domains.ts`. The fifth domain is named THEODO. Availability counts come from `public.registrations`; the registration RPC applies a per-domain transaction lock before checking capacity and writing the registration.
 
-## Authentication and admin setup
+The form displays a UPI QR generated from the confirmed UPI ID in the same central configuration. Payment is ₹1,500 per team. Uploads accept PNG, JPEG or WebP up to 3 MiB and are written to the private `payment-proofs` bucket. The server validates file signatures and stores only an object path on the registration. Registration and payment statuses start as `payment_pending` and `pending`. This workflow does not create participant auth users or issue credentials.
 
-The schema creates one `profiles` row for each new Supabase Auth user. Use the new project's email OTP or password flow; configure redirect URLs in that project's Auth settings. Participant credentials and accounts are not imported. Create the initial admin by signing up through this portal, then promote that account in the **new project's** SQL editor:
+## Registration and credentials
+
+The public registration flow does not create Supabase Auth users or credentials. An authorized admin manually confirms the payment in `/admin`. Confirmation creates or activates the team leader's account, creates individual QR tokens, confirms the registration, and offers a copyable message. Newly created accounts receive a cryptographically random temporary password and must change it at first sign-in. The temporary password and QR secrets are encrypted at rest with `PORTAL_CREDENTIAL_ENCRYPTION_KEY`; configure a stable base64 encoded 32-byte key before confirming any payments.
+
+Participant sign-in is at `/login`; the team leader can access the team's participant QR codes and submit accommodation requests at `/participant`. Admins use `/admin`. To authorize the first administrator, create their Auth account, then promote only that account from the new project's SQL editor:
 
 ```sql
 update public.profiles
 set role = 'admin'
-where id = (select id from auth.users where email = 'ADMIN_EMAIL');
+where id = (select id from auth.users where lower(email) = lower('admin@example.com'));
 ```
 
-The public client uses only the new project's publishable/anon key. Never put a service-role key in a `NEXT_PUBLIC_*` variable or browser code.
+Every admin API verifies the Supabase access token and `profiles.role` on the server. Payment proof previews use short-lived signed URLs from the private bucket. Meal check-in accepts QR scans or participant email, requires a confirmed registration, and uses a database unique constraint to prevent duplicate collection. Accommodation requests are team-leader-only and admins can approve, reject or complete them.
 
 ## Data and access boundaries
 
-- `profiles`: participant profile and role.
-- `portal_config`, `events`: portal-owned branding, contact, registration settings, event descriptions, rules and team constraints.
-- `registrations`, `registration_members`: team registration data, scoped to its leader and portal admins by RLS.
-- `registration-documents`: private storage bucket. Object paths start with the uploader's auth user ID; PDF/JPEG/PNG uploads are limited to 10 MiB.
-- RLS is enabled on every public table. Admin roles must be granted using trusted SQL in the new project.
+- `registrations`, `registration_members`: team contacts, domain/challenge selection, UTR, private proof object path, and payment/registration status.
+- `payment-proofs`: private Storage bucket. No anon or authenticated policies are created; only the server-side service role uploads proof images.
+- RLS is enabled on the database tables. Public clients have no direct read/write grants to registration records.
+- `participant_qr_tokens`, `meal_checkins`, `accommodation_requests`, `admin_audit_log`: private participant and admin workflows. Admin API actions use server-side role checks; participant APIs verify the authenticated team leader.
 
-The first migration is `supabase/migrations/202611130001_initial_portal_schema.sql`. Apply it only to the new portal project. Treat changes to registration and admin policies as security-sensitive and review them before deployment.
+The schema migrations are `supabase/migrations/202611130001_initial_portal_schema.sql`, `supabase/migrations/202611130002_simplified_registration.sql` and `supabase/migrations/202611130003_admin_participant_portals.sql`. Apply them only to the new portal project. `supabase/tests/registration_capacity.sql` is a rollback-only SQL integration check for the atomic capacity RPC. Apply the third migration before using `/admin` or `/participant`. Treat changes to registration and storage access as security-sensitive and review them before deployment.
 
 ## New GitHub repository
 
-This local folder is intended to be the independent repository `https://github.com/sumukh0759T/portal-avishkar`. After creating that empty repository under the correct GitHub account, from this folder run:
+This folder is configured with `origin` at `https://github.com/sumukh0759T/portal-avishkar`. To publish a later local commit:
 
 ```powershell
-git init
 git add .
-git commit -m "Initial independent AVISHKAR portal"
-git branch -M main
-git remote add origin https://github.com/sumukh0759T/portal-avishkar.git
-git push -u origin main
+git push origin main
 ```
 
 Do not add the old `avishkarait` remote. `.env.local` and other `.env.*` files are ignored; `.env.example` contains placeholders only.
 
 ## Separate Vercel deployment
 
-Sign in to the **different Vercel account**, import only `sumukh0759T/portal-avishkar`, and configure the same two Supabase values from the new portal project plus:
+Sign in to the **different Vercel account**, import only `sumukh0759T/portal-avishkar`, and configure the new portal URL, publishable key and server-only service-role key plus:
 
 - `NEXT_PUBLIC_APP_URL=https://portal.avishkarait.online`
 - `NEXT_PUBLIC_SITE_DOMAIN=portal.avishkarait.online`

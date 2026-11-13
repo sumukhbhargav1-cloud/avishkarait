@@ -2,15 +2,19 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "../../../lib/supabase";
 
 export default function AuthCallbackPage() {
   const [message, setMessage] = useState("Verifying your secure sign-in link…");
+  const router = useRouter();
 
   useEffect(() => {
     const supabase = getSupabaseClient();
     supabase.auth.getSession().then(({ data, error }) => {
-      setMessage(error ? "This sign-in link could not be verified. Request a fresh link and try again." : data.session ? "You’re signed in. Registration steps will be available here when an event is open." : "This sign-in link has expired. Request a fresh link and try again.");
+      if (error) setMessage("This sign-in link could not be verified. Request a fresh link and try again.");
+      else if (data.session) { setMessage("You’re signed in. Opening your participant portal…"); router.replace("/participant"); }
+      else setMessage("This sign-in link has expired. Request a fresh link and try again.");
     });
   }, []);
 
@@ -21,7 +25,7 @@ export default function AuthCallbackPage() {
         <p className="eyebrow"><span className="live-dot" /> SECURE SIGN-IN</p>
         <h1>Welcome<br /><span>to the portal.</span></h1>
         <p className="auth-intro" role="status">{message}</p>
-        <Link className="button button-primary" href="/">Return to portal <span aria-hidden="true">↗</span></Link>
+        <Link className="button button-primary" href="/participant">Open participant portal <span aria-hidden="true">↗</span></Link>
       </section>
       <footer className="auth-footer">Independent AVISHKAR participant portal</footer>
     </main>
