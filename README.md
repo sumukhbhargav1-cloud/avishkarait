@@ -2,6 +2,8 @@
 
 Public event website and Supabase-backed team registration, participant, and administrator portals for the AIT Innovation Hackathon.
 
+Register teams at [the AVISHKAR registration page](https://portal.avishkarait.online/register). Participants and administrators sign in at [the AVISHKAR portal](https://portal.avishkarait.online/login).
+
 ## Features
 
 - Public pages for the event, domains, schedule, guidelines, FAQ, contact, registration, privacy, terms and the Chikkamagaluru travel guide at `/blog`.
