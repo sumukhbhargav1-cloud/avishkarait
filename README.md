@@ -18,6 +18,8 @@ The form displays a UPI QR generated from the confirmed UPI ID in the same centr
 
 ## Registration and credentials
 
+The registration page, admin portal and participant portal all use the same independent Supabase project. `registrations` is the team record, `registration_members` stores each additional member's contact details, and each accommodation request is stored with its team's contact phone. Admin screens assemble these related rows into team and request cards; no second participant database is used.
+
 The public registration flow does not create Supabase Auth users or credentials. An authorized admin manually confirms the payment in `/admin`. Confirmation creates or activates the team leader's account, creates individual QR tokens, confirms the registration, and offers a copyable message. Newly created accounts receive a cryptographically random temporary password and must change it at first sign-in. The temporary password and QR secrets are encrypted at rest with `PORTAL_CREDENTIAL_ENCRYPTION_KEY`; configure a stable base64 encoded 32-byte key before confirming any payments.
 
 Participant sign-in is at `/login`; the team leader can access the team's participant QR codes and submit accommodation requests at `/participant`. Admins use `/admin`. To authorize the first administrator, create their Auth account, then promote only that account from the new project's SQL editor:
@@ -37,7 +39,7 @@ Every admin API verifies the Supabase access token and `profiles.role` on the se
 - RLS is enabled on the database tables. Public clients have no direct read/write grants to registration records.
 - `participant_qr_tokens`, `meal_checkins`, `accommodation_requests`, `admin_audit_log`: private participant and admin workflows. Admin API actions use server-side role checks; participant APIs verify the authenticated team leader.
 
-The schema migrations are `supabase/migrations/202611130001_initial_portal_schema.sql`, `supabase/migrations/202611130002_simplified_registration.sql` and `supabase/migrations/202611130003_admin_participant_portals.sql`. Apply them only to the new portal project. `supabase/tests/registration_capacity.sql` is a rollback-only SQL integration check for the atomic capacity RPC. Apply the third migration before using `/admin` or `/participant`. Treat changes to registration and storage access as security-sensitive and review them before deployment.
+The schema migrations are `supabase/migrations/202611130001_initial_portal_schema.sql` through `202611130004_accommodation_request_contact.sql`. Apply them only to the new portal project. `supabase/tests/registration_capacity.sql` is a rollback-only SQL integration check for the atomic capacity RPC. Apply all four migrations before using `/admin` or `/participant`. Treat changes to registration and storage access as security-sensitive and review them before deployment.
 
 ## New GitHub repository
 

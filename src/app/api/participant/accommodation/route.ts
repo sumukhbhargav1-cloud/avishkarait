@@ -13,9 +13,9 @@ export async function POST(request: Request) {
   if (!Number.isInteger(guests) || guests < 1 || guests > 10 || requirements.length > 1000 || (checkIn && checkOut && checkOut <= checkIn)) {
     return NextResponse.json({ error: "Guest count, dates or requirements are invalid." }, { status: 400 });
   }
-  const { data: registration } = await auth.supabase.from("registrations").select("id,team_leader_name").eq("team_leader_id", auth.user.id).eq("status", "confirmed").maybeSingle();
+  const { data: registration } = await auth.supabase.from("registrations").select("id,team_leader_name,team_leader_phone").eq("team_leader_id", auth.user.id).eq("status", "confirmed").maybeSingle();
   if (!registration) return NextResponse.json({ error: "No confirmed team is linked to this account." }, { status: 403 });
-  const { data, error } = await auth.supabase.from("accommodation_requests").insert({ registration_id: registration.id, participant_user_id: auth.user.id, participant_name: registration.team_leader_name, guest_count: guests, check_in: checkIn, check_out: checkOut, requirements }).select("id,status,guest_count,check_in,check_out,requirements").single();
+  const { data, error } = await auth.supabase.from("accommodation_requests").insert({ registration_id: registration.id, participant_user_id: auth.user.id, participant_name: registration.team_leader_name, participant_phone: registration.team_leader_phone, guest_count: guests, check_in: checkIn, check_out: checkOut, requirements }).select("id,status,participant_name,participant_phone,guest_count,check_in,check_out,requirements").single();
   if (error) return NextResponse.json({ error: "Could not save the accommodation request." }, { status: 500 });
   return NextResponse.json({ success: true, request: data }, { status: 201 });
 }

@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const { supabase } = context;
   const [{ data: registrations, error }, { data: accommodations }, { data: mealCheckins }, { data: attempts }] = await Promise.all([
     supabase.from("registrations").select("id,team_name,domain_slug,domain_name,challenge_id,team_size,team_leader_name,team_leader_email,team_leader_phone,status,payment_status,utr_reference,payment_proof_path,submitted_at,created_at,registration_reference,confirmed_at,registration_members(id,full_name,email,phone)").order("created_at", { ascending: false }),
-    supabase.from("accommodation_requests").select("id,registration_id,participant_name,guest_count,check_in,check_out,requirements,status,created_at").order("created_at", { ascending: false }),
+    supabase.from("accommodation_requests").select("id,registration_id,participant_name,participant_phone,guest_count,check_in,check_out,requirements,status,created_at").order("created_at", { ascending: false }),
     supabase.from("meal_checkins").select("id,checked_in_at,participant_token_id,participant_qr_tokens(participant_name,participant_email,registration_id)").order("checked_in_at", { ascending: false }).limit(100),
     supabase.from("meal_checkin_attempts").select("id,outcome,created_at").order("created_at", { ascending: false }).limit(100),
   ]);
