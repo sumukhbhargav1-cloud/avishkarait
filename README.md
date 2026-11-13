@@ -12,7 +12,7 @@ Requirements: Node.js 20.9+ and npm.
 4. Apply migrations in order to the new project: `supabase link --project-ref <NEW_PROJECT_REF>` followed by `supabase db push`.
 5. Run `npm run dev` and open `http://localhost:3000`.
 
-Registration domains, challenge rules, team-size limits, coordinator contacts and the organiser-confirmed capacity of 20 teams per domain are pre-coded in `src/config/registration-domains.ts`. The fifth domain is named THEODO. Availability counts come from `public.registrations`; the registration RPC applies a per-domain transaction lock before checking capacity and writing the registration.
+Registration domains, challenge rules, team-size limits, per-domain student and faculty coordinator contacts, and the organiser-confirmed capacity of 20 teams per domain are pre-coded in `src/config/registration-domains.ts`. The fifth domain is named THEODO. Availability counts come from `public.registrations`; the registration RPC applies a per-domain transaction lock before checking capacity and writing the registration.
 
 The form displays a UPI QR generated from the confirmed UPI ID in the same central configuration. Payment is ₹1,500 per team. Uploads accept PNG, JPEG or WebP up to 2 MiB and are written to the private `payment-proofs` bucket. The server validates file signatures and stores only an object path on the registration. Registration and payment statuses start as `payment_pending` and `pending`. This workflow does not create participant auth users or issue credentials. The successful submission screen thanks the team and explains that organisers will confirm manually through WhatsApp.
 

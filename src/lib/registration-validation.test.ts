@@ -16,11 +16,19 @@ const valid = {
 
 test("every pre-coded domain has capacity, contact, and challenge rules", () => {
   assert.equal(registrationDomains.length, 5);
+  const expectedStudentPhones = ["6364328712", "9113688812", "9380662076", "9964127576", "9110463448"];
+  assert.deepEqual(registrationDomains.map((domain) => domain.studentCoordinator.phone), expectedStudentPhones);
   for (const domain of registrationDomains) {
     assert.ok(domain.capacity > 0);
-    assert.ok(domain.studentCoordinators.length > 0);
+    assert.ok(domain.studentCoordinator.name.length > 0);
+    assert.ok(domain.studentCoordinator.phone.length > 0);
     assert.ok(domain.challenges.length > 0);
   }
+  assert.equal(registrationDomains.find((domain) => domain.slug === "ai-cybersecurity-fintech")?.facultyCoordinator, undefined);
+  assert.equal(registrationDomains.find((domain) => domain.slug === "full-stack")?.facultyCoordinator?.name, "Ms Sana Ara");
+  assert.equal(registrationDomains.find((domain) => domain.slug === "iot-embedded")?.facultyCoordinator?.name, "Dr. Raghukumar B S");
+  assert.equal(registrationDomains.find((domain) => domain.slug === "mechspark")?.facultyCoordinator?.name, "Mr. Praveen");
+  assert.equal(registrationDomains.find((domain) => domain.slug === "theodo")?.facultyCoordinator?.name, "Mr. Naveen");
 });
 
 test("accepts a valid team without duplicating the leader", () => {

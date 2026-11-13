@@ -16,17 +16,13 @@ export type RegistrationDomain = {
   minimumTeamSize: number;
   maximumTeamSize: number;
   capacity: number;
-  studentCoordinators: { name: string; phone: string }[];
+  studentCoordinator: { name: string; phone: string };
+  facultyCoordinator?: { name: string; phone: string };
   challenges: ChallengeConfig[];
 };
 
 // Domain requirements are copied from the reference project's verified
 // AVISHKAR 2K26 domain content. Capacity 20/domain was supplied by the organiser.
-export const studentCoordinators = [
-  { name: "Chirag K P", phone: "+91 6362391028" },
-  { name: "Sumukh Bhargav", phone: "+91 8618376684" },
-] as const;
-
 export const registrationDomains: RegistrationDomain[] = [
   {
     slug: "ai-cybersecurity-fintech",
@@ -44,7 +40,7 @@ export const registrationDomains: RegistrationDomain[] = [
     minimumTeamSize: 2,
     maximumTeamSize: 4,
     capacity: 20,
-    studentCoordinators: [...studentCoordinators],
+    studentCoordinator: { name: "Yogin", phone: "6364328712" },
     challenges: [{
       id: "ai-cybersecurity-fintech",
       name: "AI in Cybersecurity & FinTech",
@@ -75,7 +71,8 @@ export const registrationDomains: RegistrationDomain[] = [
     minimumTeamSize: 2,
     maximumTeamSize: 4,
     capacity: 20,
-    studentCoordinators: [...studentCoordinators],
+    studentCoordinator: { name: "Likeeth G Urs", phone: "9113688812" },
+    facultyCoordinator: { name: "Ms Sana Ara", phone: "9148845386" },
     challenges: [{
       id: "full-stack",
       name: "Full Stack Development",
@@ -104,7 +101,8 @@ export const registrationDomains: RegistrationDomain[] = [
     minimumTeamSize: 2,
     maximumTeamSize: 4,
     capacity: 20,
-    studentCoordinators: [...studentCoordinators],
+    studentCoordinator: { name: "Divya P", phone: "9380662076" },
+    facultyCoordinator: { name: "Dr. Raghukumar B S", phone: "+91 91642 80757" },
     challenges: [{
       id: "iot-embedded",
       name: "IoT & Embedded Systems",
@@ -128,7 +126,8 @@ export const registrationDomains: RegistrationDomain[] = [
     minimumTeamSize: 1,
     maximumTeamSize: 4,
     capacity: 20,
-    studentCoordinators: [...studentCoordinators],
+    studentCoordinator: { name: "Kishan", phone: "9964127576" },
+    facultyCoordinator: { name: "Mr. Praveen", phone: "8762006969" },
     challenges: [
       {
         id: "lathe-machine-operating",
@@ -182,7 +181,8 @@ export const registrationDomains: RegistrationDomain[] = [
     minimumTeamSize: 2,
     maximumTeamSize: 4,
     capacity: 20,
-    studentCoordinators: [...studentCoordinators],
+    studentCoordinator: { name: "Rahul", phone: "9110463448" },
+    facultyCoordinator: { name: "Mr. Naveen", phone: "+91 95917 93656" },
     challenges: [
       {
         id: "bridge-x",
