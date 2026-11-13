@@ -92,3 +92,4 @@ For an existing database, apply only the migrations not already applied, in orde
 
 The project URL and publishable key are set in the ignored local `.env.local` file. Apply the migrations in order before using the data-backed features.
 
+registration portal: portal.avishkarait.online/register
