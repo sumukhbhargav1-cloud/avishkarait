@@ -93,8 +93,8 @@ runTest('MECHSPARK 2K26: max 4 members, 8 hours, 3 specific challenges, PPE & sa
   assert(cardboard.maxTeamSize === 4, 'Cardboard model max 4');
 });
 
-runTest('CIVILX: BRIDGE-X (4), CADATHON (2, offline), SURVEYOR-X (4, calculator)', () => {
-  const d = eventDomains.find(x => x.slug === 'civilx')!;
+runTest('THEODO: BRIDGE-X (4), CADATHON (2, offline), SURVEYOR-X (4, calculator)', () => {
+  const d = eventDomains.find(x => x.slug === 'theodo')!;
   assert(d !== undefined, 'Domain exists');
   
   const bridge = d.challenges.find(c => c.id === 'bridge-x')!;
@@ -242,7 +242,7 @@ runTest('MECHSPARK Cardboard Model enforces max 4 members', () => {
   assert(!registrationInputSchema.safeParse(createPayload('cardboard-mechanical-model', 4)).success, '5 members invalid');
 });
 
-// CIVILX BRIDGE-X: exactly 4 members
+// THEODO BRIDGE-X: exactly 4 members
 runTest('BRIDGE-X rejects 3 members (leader + 2)', () => {
   const res = registrationInputSchema.safeParse(createPayload('bridge-x', 2));
   assert(!res.success, 'Should fail validation');
@@ -262,7 +262,7 @@ runTest('BRIDGE-X rejects 5 members (leader + 4)', () => {
   assert(err !== undefined, 'Allows no more than 4');
 });
 
-// CIVILX CADATHON: exactly 2 members
+// THEODO CADATHON: exactly 2 members
 runTest('CADATHON rejects 1 member (leader only)', () => {
   const res = registrationInputSchema.safeParse(createPayload('cadathon', 0));
   assert(!res.success, 'Should fail validation');
@@ -282,7 +282,7 @@ runTest('CADATHON rejects 3 members (leader + 2)', () => {
   assert(err !== undefined, 'Allows no more than 2');
 });
 
-// CIVILX SURVEYOR-X: exactly 4 members
+// THEODO SURVEYOR-X: exactly 4 members
 runTest('SURVEYOR-X rejects 3 members (leader + 2)', () => {
   const res = registrationInputSchema.safeParse(createPayload('surveyor-x', 2));
   assert(!res.success, 'Should fail validation');

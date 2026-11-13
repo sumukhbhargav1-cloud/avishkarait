@@ -21,7 +21,7 @@ export type EventDomain = {
   minTeamSize?: number;
   maxTeamSize?: number;
   duration?: string;
-  registrationOpen?: boolean;
+  coordinators: { role: string; name: string; phone: string }[];
   challenges: DomainChallenge[];
 };
 
@@ -36,6 +36,9 @@ export const eventDomains: EventDomain[] = [
   // Duration: 24 hours (confirmed).
   {
     number: '01', code: 'CYB', slug: 'ai-cybersecurity-fintech',
+    coordinators: [
+      { role: 'Student Coordinator', name: 'Yogin', phone: '+91 6364328712' },
+    ],
     name: 'AI in Cybersecurity & FinTech',
     short: 'Intelligent systems built for trust and financial security.',
     description: 'Artificial intelligence applications in cybersecurity, financial technology, intelligent security systems and innovative financial solutions.',
@@ -68,6 +71,10 @@ export const eventDomains: EventDomain[] = [
   // Duration: 24 hours (confirmed).
   {
     number: '02', code: 'FSD', slug: 'full-stack',
+    coordinators: [
+      { role: 'Student Coordinator', name: 'Likeeth G Urs', phone: '+91 9113688812' },
+      { role: 'Faculty Coordinator', name: 'Ms Sana Ara', phone: '+91 9148845386' },
+    ],
     name: 'Full Stack Development',
     short: 'Functional software from polished interface to connected data.',
     description: 'Develop functional, innovative and user-oriented digital applications using frontend and backend technologies.',
@@ -101,6 +108,10 @@ export const eventDomains: EventDomain[] = [
   // Build complete prototype during the event. No pre-built projects.
   {
     number: '03', code: 'IOT', slug: 'iot-embedded',
+    coordinators: [
+      { role: 'Student Coordinator', name: 'Divya P', phone: '+91 9380662076' },
+      { role: 'Faculty Coordinator', name: 'Dr. Raghukumar B S', phone: '+91 91642 80757' },
+    ],
     name: 'IoT & Embedded Systems',
     short: 'Connect software, sensing and the physical world.',
     description: 'Build a complete connected or embedded project during the hackathon.',
@@ -132,6 +143,10 @@ export const eventDomains: EventDomain[] = [
   // PPE and workshop safety rules mandatory.
   {
     number: '04', code: 'MEC', slug: 'mechspark',
+    coordinators: [
+      { role: 'Student Coordinator', name: 'Kishan', phone: '+91 9964127576' },
+      { role: 'Faculty Coordinator', name: 'Mr. Praveen', phone: '+91 8762006969' },
+    ],
     name: 'MECHSPARK 2K26',
     short: 'IDEAS THAT MOVE THE WORLD.',
     description: 'MECHSPARK 2K26 – Mechanical Engineering. IDEAS THAT MOVE THE WORLD.',
@@ -181,14 +196,18 @@ export const eventDomains: EventDomain[] = [
     ],
   },
 
-  // ── 05 · CIVILX ────────────────────────────────────────────────────────────
+  // ── 05 · THEODO ────────────────────────────────────────────────────────────
   // Three sub-challenges with distinct team sizes (all confirmed):
   //   BRIDGE-X: exactly 4 members
   //   CADATHON: exactly 2 members; offline; AutoCAD residential building design
   //   SURVEYOR-X: exactly 4 members; participants bring calculator; practical levelling
   {
-    number: '05', code: 'CIV', slug: 'civilx',
-    name: 'CIVILX – Civil Engineering & Structural Innovation',
+    number: '05', code: 'CIV', slug: 'theodo',
+    coordinators: [
+      { role: 'Student Coordinator', name: 'Rahul', phone: '+91 9110463448' },
+      { role: 'Faculty Coordinator', name: 'Mr. Naveen', phone: '+91 95917 93656' },
+    ],
+    name: 'THEODO – Civil Engineering & Structural Innovation',
     short: 'Structural thinking, drafting and field engineering.',
     description: 'Apply civil engineering skills to structural design, AutoCAD drafting and field surveying challenges.',
     focus: ['Structural design and innovation', 'Civil CAD and building design', 'Surveying and field levelling'],

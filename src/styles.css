@@ -281,3 +281,12 @@
   .sponsor-cta{padding:22px}
   .footer-credit{font-size:10px}
 }
+
+.domain-contacts{display:grid;gap:10px;margin:16px 0;font-size:13px}
+.domain-contacts dt{font-weight:700}
+.domain-contacts dd{margin:2px 0 0}
+.domain-contacts a{text-decoration:underline}
+.domain-rules{border-top:1px solid #e5e7e8;padding:12px 0;font-size:13px;line-height:1.55}
+.domain-rules summary{cursor:pointer;font-weight:700}
+.domain-rules h4,.domain-rules h5{font-size:inherit;margin:12px 0 4px}
+.experience-actions>span{font-size:12px;font-weight:700}
