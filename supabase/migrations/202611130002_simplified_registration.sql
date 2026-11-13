@@ -4,44 +4,47 @@
 alter table public.registrations
   alter column event_id drop not null,
   alter column team_leader_id drop not null,
-  add column domain_slug text,
-  add column domain_name text,
-  add column challenge_id text,
-  add column team_size smallint,
-  add column team_leader_name text,
-  add column team_leader_email text,
-  add column team_leader_phone text,
-  add column utr_reference text,
-  add column payment_proof_path text,
-  add column payment_status text not null default 'pending',
-  add column registration_reference text not null default ('AV26-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 10)));
+  add column if not exists domain_slug text,
+  add column if not exists domain_name text,
+  add column if not exists challenge_id text,
+  add column if not exists team_size smallint,
+  add column if not exists team_leader_name text,
+  add column if not exists team_leader_email text,
+  add column if not exists team_leader_phone text,
+  add column if not exists utr_reference text,
+  add column if not exists payment_proof_path text,
+  add column if not exists payment_status text not null default 'pending',
+  add column if not exists registration_reference text not null default ('AV26-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 10)));
 
 alter table public.registrations drop constraint if exists registrations_status_check;
 alter table public.registrations add constraint registrations_status_check
   check (status in ('draft', 'submitted', 'approved', 'rejected', 'payment_pending'));
+alter table public.registrations drop constraint if exists registrations_payment_status_check;
 alter table public.registrations add constraint registrations_payment_status_check
   check (payment_status in ('pending', 'verified', 'rejected'));
+alter table public.registrations drop constraint if exists registrations_team_size_check;
 alter table public.registrations add constraint registrations_team_size_check
   check (team_size is null or team_size between 1 and 10);
+alter table public.registrations drop constraint if exists registrations_utr_check;
 alter table public.registrations add constraint registrations_utr_check
   check (utr_reference is null or utr_reference ~ '^[A-Za-z0-9]{6,40}$');
 
-create unique index registrations_reference_unique on public.registrations(registration_reference);
-create unique index registrations_domain_leader_email_unique
+create unique index if not exists registrations_reference_unique on public.registrations(registration_reference);
+create unique index if not exists registrations_domain_leader_email_unique
   on public.registrations(domain_slug, lower(team_leader_email))
   where domain_slug is not null and team_leader_email is not null;
-create unique index registrations_domain_team_name_unique
+create unique index if not exists registrations_domain_team_name_unique
   on public.registrations(domain_slug, lower(trim(team_name)))
   where domain_slug is not null;
-create unique index registrations_payment_utr_unique
+create unique index if not exists registrations_payment_utr_unique
   on public.registrations(lower(utr_reference))
   where utr_reference is not null;
-create index registrations_domain_slug_idx on public.registrations(domain_slug);
+create index if not exists registrations_domain_slug_idx on public.registrations(domain_slug);
 
 alter table public.registration_members
-  add column phone text,
-  add column domain_slug text;
-create unique index registration_members_domain_email_unique
+  add column if not exists phone text,
+  add column if not exists domain_slug text;
+create unique index if not exists registration_members_domain_email_unique
   on public.registration_members(domain_slug, lower(email))
   where domain_slug is not null;
 
