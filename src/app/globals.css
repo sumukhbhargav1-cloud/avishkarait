@@ -117,6 +117,10 @@ button { cursor:pointer; }
 .file-control::file-selector-button { min-height:30px; border:0; background:var(--navy); color:white; padding:0 11px; margin-right:10px; font-size:9px; cursor:pointer; }
 .file-selected { color:#40634b; font-size:9px; margin:7px 0 0; }
 .registration-submit { border-top:2px solid var(--navy); padding:19px 2px 0; }
+.registration-honeypot { position:absolute!important; left:-10000px!important; top:auto!important; width:1px!important; height:1px!important; overflow:hidden!important; }
+.turnstile-block { display:grid; justify-items:start; gap:6px; margin:0 0 17px; min-height:88px; }
+.turnstile-block>div { min-height:65px; }
+.turnstile-block .field-hint { margin:0; }
 .rules-accept { display:flex; align-items:flex-start; gap:10px; color:#59616a; font-size:10px; line-height:1.6; }
 .rules-accept input { accent-color:var(--crimson); margin:2px 0 0; width:15px; height:15px; flex:none; }
 .rules-accept b { color:var(--navy); }

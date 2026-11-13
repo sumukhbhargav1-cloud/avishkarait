@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { paymentConfig, registrationDomains } from "@/config/registration-domains";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { validatePaymentProof, validateRegistrationInput } from "@/lib/registration-validation";
+import { verifyRegistrationTurnstile } from "@/lib/turnstile";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,20 @@ export async function POST(request: Request) {
     formData = await request.formData();
   } catch {
     return NextResponse.json({ error: "The registration form could not be read." }, { status: 400 });
+  }
+
+  if (String(formData.get("website") ?? "").trim()) {
+    return NextResponse.json({ error: "Registration could not be accepted." }, { status: 400 });
+  }
+  const turnstile = await verifyRegistrationTurnstile(String(formData.get("turnstileToken") ?? ""));
+  if (turnstile === "unconfigured") {
+    return NextResponse.json({ error: "Registration security verification is not configured. No registration was saved." }, { status: 503 });
+  }
+  if (turnstile === "unavailable") {
+    return NextResponse.json({ error: "Anti-spam verification is temporarily unavailable. Please try again." }, { status: 503 });
+  }
+  if (turnstile !== "valid") {
+    return NextResponse.json({ error: "Anti-spam verification expired or failed. Please complete it again." }, { status: 400 });
   }
 
   let payload: unknown;

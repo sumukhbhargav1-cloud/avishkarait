@@ -1,9 +1,10 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { paymentConfig, type RegistrationDomain } from "@/config/registration-domains";
 import { PUBLIC_WEBSITE_URL } from "@/config/site";
+import { TurnstileChallenge } from "./turnstile-challenge";
 import { MAX_PAYMENT_PROOF_BYTES, validatePaymentProof, validateRegistrationInput, type RegistrationInput, type RegistrationMemberInput } from "@/lib/registration-validation";
 
 type DomainWithCapacity = RegistrationDomain & { registeredTeams: number; remainingSlots: number; full: boolean };
@@ -20,12 +21,16 @@ export default function RegisterPage() {
   const [members, setMembers] = useState<RegistrationMemberInput[]>([emptyPerson()]);
   const [utrReference, setUtrReference] = useState("");
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [captchaEpoch, setCaptchaEpoch] = useState(0);
   const [acceptedRules, setAcceptedRules] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState<Submission | null>(null);
   const [loadError, setLoadError] = useState("");
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
+  const handleTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
 
   useEffect(() => {
     let active = true;
@@ -87,6 +92,10 @@ export default function RegisterPage() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    const honeypot = String(new FormData(event.currentTarget).get("website") ?? "");
+    if (honeypot.trim()) { setError("Registration could not be accepted."); return; }
+    if (!turnstileSiteKey) { setError("Registration security verification is not configured. Please contact the organisers."); return; }
+    if (!turnstileToken) { setError("Complete the anti-spam verification before submitting."); return; }
     if (!domain || !challenge) { setError("Select a domain and challenge."); return; }
     if (domain.full) { setError("This domain has reached its capacity. Choose another domain."); return; }
     if (!acceptedRules) { setError("Confirm that you have read the selected domain rules."); return; }
@@ -103,6 +112,8 @@ export default function RegisterPage() {
       const formData = new FormData();
       formData.set("registration", JSON.stringify(input));
       formData.set("paymentProof", paymentProof);
+      formData.set("turnstileToken", turnstileToken);
+      formData.set("website", honeypot);
       const response = await fetch("/api/registrations", { method: "POST", body: formData });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ?? "Registration could not be submitted.");
@@ -111,6 +122,8 @@ export default function RegisterPage() {
       setError(cause instanceof Error ? cause.message : "Registration could not be submitted. Please try again.");
     } finally {
       setBusy(false);
+      setTurnstileToken("");
+      setCaptchaEpoch((current) => current + 1);
     }
   }
 
@@ -193,9 +206,11 @@ export default function RegisterPage() {
           </section>
 
           <div className="registration-submit">
+            <div className="registration-honeypot" aria-hidden="true"><label htmlFor="website">Leave this field empty</label><input id="website" name="website" type="text" autoComplete="off" tabIndex={-1} /></div>
+            {turnstileSiteKey ? <TurnstileChallenge key={captchaEpoch} siteKey={turnstileSiteKey} onToken={handleTurnstileToken} /> : <p className="form-error" role="alert">Registration security verification is not configured yet. Please contact the organisers.</p>}
             <label className="rules-accept"><input type="checkbox" checked={acceptedRules} onChange={(event) => setAcceptedRules(event.target.checked)} /><span>I have read the rules for <b>{domain?.name}</b>{challenge && domain && domain.challenges.length > 1 ? <> / <b>{challenge.name}</b></> : ""} and confirm my team details are correct.</span></label>
             {error && <p className="form-error" role="alert">{error}</p>}
-            <button className="button button-red submit-button" type="submit" disabled={busy || !domain || domain.full}>{busy ? "Submitting securely…" : "Submit registration"}<span aria-hidden="true">↗</span></button>
+            <button className="button button-red submit-button" type="submit" disabled={busy || !domain || domain.full || !turnstileSiteKey || !turnstileToken}>{busy ? "Submitting securely…" : "Submit registration"}<span aria-hidden="true">↗</span></button>
             <p className="submit-note">Payment status starts as pending. No participant account or login credentials are created.</p>
           </div>
         </form>)}

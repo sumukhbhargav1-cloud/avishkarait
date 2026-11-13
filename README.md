@@ -20,7 +20,9 @@ The form displays a UPI QR generated from the confirmed UPI ID in the same centr
 
 The registration page, admin portal and participant portal all use the same independent Supabase project. `registrations` is the team record, `registration_members` stores each additional member's contact details, and each accommodation request is stored with its team's contact phone. Admin screens assemble these related rows into team and request cards; no second participant database is used.
 
-The public registration flow does not create Supabase Auth users or credentials. An authorized admin manually confirms the payment in `/admin`. Confirmation creates or activates the team leader's account, creates individual QR tokens, confirms the registration, and offers a copyable message. Organisers send confirmation and access details manually through WhatsApp. Newly created participant accounts receive a cryptographically random temporary password and must change it at first sign-in. The temporary password and QR secrets are encrypted at rest with `PORTAL_CREDENTIAL_ENCRYPTION_KEY`; configure a stable base64 encoded 32-byte key before confirming any payments. There is no self-service sign-up or email-link login; `/login` accepts organiser-issued email/password credentials and routes users based on their profile role.
+The public registration flow does not create Supabase Auth users or credentials. An authorized admin manually confirms the payment in `/admin`. Confirmation creates or activates the team leader's account, creates individual QR tokens, confirms the registration, and offers a copyable message. Organisers send confirmation and access details manually through WhatsApp. Newly created participant accounts receive a cryptographically random temporary password and must change it at first sign-in. The temporary password and QR secrets are encrypted at rest with `PORTAL_CREDENTIAL_ENCRYPTION_KEY`; set this key in Vercel before confirming payments. Generate it once with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`, then keep the same value across deployments. Changing the key makes previously encrypted credentials unreadable. There is no self-service sign-up or email-link login; `/login` accepts organiser-issued email/password credentials and routes users based on their profile role.
+
+Public registration uses Cloudflare Turnstile. The widget runs in the form and every submission is verified server-side through Cloudflare Siteverify before the proof image is uploaded or any registration is written. A honeypot field adds a basic extra bot check. Configure the Turnstile site key and secret before enabling registration; submissions fail closed if the keys are missing or verification fails.
 
 Participant sign-in is at `/login`; the team leader can access the team's participant QR codes and submit accommodation requests at `/participant`. Admins use `/admin`. Create the single administrator account once from Supabase Authentication > Users, then promote that account from the new project's SQL editor:
 
@@ -62,11 +64,15 @@ Add these project environment variables for Production and Preview, using values
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (server-only; never prefix it with `NEXT_PUBLIC_`)
 - `PORTAL_CREDENTIAL_ENCRYPTION_KEY` (stable base64-encoded 32-byte key; keep the same value across deployments)
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (public widget key)
+- `TURNSTILE_SECRET_KEY` (server-only Turnstile secret)
 - `NEXT_PUBLIC_APP_URL=https://portal.avishkarait.online`
 - `NEXT_PUBLIC_SITE_DOMAIN=portal.avishkarait.online`
 - `NEXT_PUBLIC_PARTICIPANT_PORTAL_URL=https://portal.avishkarait.online/participant`
 
 Apply all Supabase migrations before testing workflows. In the new Supabase project's Auth URL settings, set the production site URL to `https://portal.avishkarait.online` and add `https://portal.avishkarait.online/auth/callback` to the allowed redirect URLs. Add `portal.avishkarait.online` to this new Vercel project's Domains and configure the DNS records Vercel provides. Keep `avishkarait.online` attached to its existing public-site hosting.
+
+Create a Cloudflare Turnstile widget for `portal.avishkarait.online`, then add its site key and secret as the two Vercel variables above. Add `localhost` to the widget's allowed hostnames for local development, or use a separate development widget. Do not expose the secret key in a `NEXT_PUBLIC_` variable.
 
 After changing Vercel environment variables, start a new deployment because existing deployments do not receive updated values. Once Git is connected, pushes to `main` start production builds. A failed Vercel build should be diagnosed from that deployment's Build Logs; a successful local `npm run build` only verifies the repository build, not project settings or Supabase configuration.
 
