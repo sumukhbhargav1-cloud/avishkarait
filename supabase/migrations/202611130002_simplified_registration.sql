@@ -52,9 +52,9 @@ create unique index if not exists registration_members_domain_email_unique
 revoke all on public.registrations, public.registration_members from anon, authenticated;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('payment-proofs', 'payment-proofs', false, 3145728,
+values ('payment-proofs', 'payment-proofs', false, 2097152,
   array['image/jpeg', 'image/png', 'image/webp'])
-on conflict (id) do update set public = false, file_size_limit = 3145728,
+on conflict (id) do update set public = false, file_size_limit = 2097152,
   allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp'];
 
 -- No anon/authenticated storage policies are created. Only the server-side

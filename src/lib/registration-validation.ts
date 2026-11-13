@@ -1,6 +1,6 @@
 import { registrationDomains, type RegistrationDomain } from "../config/registration-domains.ts";
 
-export const MAX_PAYMENT_PROOF_BYTES = 3 * 1024 * 1024;
+export const MAX_PAYMENT_PROOF_BYTES = 2 * 1024 * 1024;
 export const ALLOWED_PAYMENT_PROOF_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
 
 export type RegistrationMemberInput = {
@@ -57,7 +57,7 @@ export function validateRegistrationInput(value: unknown): { input?: Registratio
 
 export async function validatePaymentProof(file: Pick<File, "size" | "type" | "arrayBuffer">): Promise<string | null> {
   if (!ALLOWED_PAYMENT_PROOF_TYPES.includes(file.type as (typeof ALLOWED_PAYMENT_PROOF_TYPES)[number])) return "Payment proof must be a PNG, JPEG or WebP image.";
-  if (file.size <= 0 || file.size > MAX_PAYMENT_PROOF_BYTES) return "Payment proof must be no larger than 5 MB.";
+  if (file.size <= 0 || file.size > MAX_PAYMENT_PROOF_BYTES) return "Payment proof must be no larger than 2 MiB.";
   const bytes = new Uint8Array(await file.arrayBuffer());
   const png = bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a;
   const jpeg = bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;

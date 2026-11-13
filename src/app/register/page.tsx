@@ -7,7 +7,7 @@ import { paymentConfig, type RegistrationDomain } from "@/config/registration-do
 import { MAX_PAYMENT_PROOF_BYTES, validatePaymentProof, validateRegistrationInput, type RegistrationInput, type RegistrationMemberInput } from "@/lib/registration-validation";
 
 type DomainWithCapacity = RegistrationDomain & { registeredTeams: number; remainingSlots: number; full: boolean };
-type Submission = { success: true; registrationReference: string; domain: string; teamName: string; status: string; paymentStatus: string; registeredTeams: number; remainingSlots: number };
+type Submission = { success: true; registrationReference: string; domain: string; teamName: string; status: string; paymentStatus: string; registeredTeams: number; remainingSlots: number; teamLeaderPhone?: string };
 const emptyPerson = (): RegistrationMemberInput => ({ fullName: "", email: "", phone: "" });
 
 export default function RegisterPage() {
@@ -118,22 +118,22 @@ export default function RegisterPage() {
 
   return (
     <main className="registration-page">
-      <header className="registration-topbar">
+      {!success && <header className="registration-topbar">
         <Link className="brand" href="/" aria-label="AVISHKAR Portal home">
           <span className="brand-mark">A<span>.</span></span>
           <span className="brand-copy"><b>AVISHKAR <i>2K26</i></b><small>INNOVATION HACKATHON</small></span>
         </Link>
         <Link className="topbar-back" href="/">Portal home <span aria-hidden="true">↗</span></Link>
-      </header>
+      </header>}
 
-      <section className="registration-hero">
+      {!success && <section className="registration-hero">
         <div className="registration-eyebrow"><span /> AVISHKAR 2K26 · TEAM ENTRY</div>
         <div className="registration-hero-layout">
           <div><p className="registration-index">01 / REGISTRATION</p><h1>Build your<br /><em>team.</em></h1></div>
           <p className="registration-hero-copy">One clear form for your domain, team and payment proof. Your registration is confirmed after the organisers verify your payment.</p>
         </div>
         <div className="registration-progress"><span className="progress-active">01 <b>TEAM DETAILS</b></span><i /><span>02 <b>PAYMENT</b></span><i /><span>03 <b>SUBMITTED</b></span></div>
-      </section>
+      </section>}
 
       <section className="registration-body">
         {loading && <div className="registration-notice">Loading registration availability…</div>}
@@ -141,12 +141,10 @@ export default function RegisterPage() {
         {success ? (
           <section className="registration-success" role="status">
             <span className="success-icon">✓</span><p className="registration-eyebrow">SUBMISSION RECEIVED</p>
-            <h2>You’re in the<br /><em>queue.</em></h2>
-            <p>Your team and payment proof were saved. Organisers will verify the UTR before confirming payment.</p>
+            <h2>Thank you for<br /><em>registering.</em></h2>
+            <p>Your team details and payment proof have been received. The organisers will verify your payment and send confirmation through WhatsApp to the team leader’s number{success.teamLeaderPhone ? ` (${success.teamLeaderPhone})` : ""}. They will also add your team to the participant group.</p>
             <dl><div><dt>Registration reference</dt><dd>{success.registrationReference}</dd></div><div><dt>Domain</dt><dd>{success.domain}</dd></div><div><dt>Registration status</dt><dd>Payment pending</dd></div><div><dt>Payment status</dt><dd>Pending verification</dd></div><div><dt>Remaining slots</dt><dd>{success.remainingSlots} of {domain?.capacity ?? 20}</dd></div></dl>
-            <p>After your payment is confirmed, the team leader can access the participant portal using the sign-in details provided by an organiser.</p>
-            <Link className="button button-outline-dark" href="/login">Participant portal sign in <span aria-hidden="true">↗</span></Link>
-            <Link className="button button-red" href="/">Return to portal home <span aria-hidden="true">↗</span></Link>
+            <p>Please keep your WhatsApp number available. Organisers will share portal access after payment verification.</p>
           </section>
         ) : (!loading && !loadError && <form className="registration-form" onSubmit={submit}>
           <section className="form-section" aria-labelledby="domain-heading">
@@ -186,7 +184,7 @@ export default function RegisterPage() {
               <div className="payment-qr-card"><QRCodeSVG value={upiUrl} size={184} level="H" includeMargin bgColor="#ffffff" fgColor="#101b31"/><small>SCAN WITH ANY UPI APP</small></div>
               <div className="upi-details"><small>PAYMENT ADDRESS</small><strong>{paymentConfig.upiId}</strong><a className="button button-outline-dark" href={upiUrl}>Open UPI app <span aria-hidden="true">↗</span></a><p>Pay ₹{paymentConfig.amountInr.toLocaleString("en-IN")} for this team. Keep the payment app confirmation screen ready for upload.</p></div>
             </div>
-            <label className="field-label" htmlFor="proof">Payment screenshot <small>PNG, JPEG or WebP · up to 3 MB</small></label>
+            <label className="field-label" htmlFor="proof">Payment screenshot <small>PNG, JPEG or WebP · up to 2 MiB</small></label>
             <input id="proof" className="form-control file-control" type="file" accept="image/png,image/jpeg,image/webp" required onChange={(event) => setPaymentProof(event.target.files?.[0] ?? null)} />
             {paymentProof && <p className="file-selected">Selected: {paymentProof.name} · {(paymentProof.size / 1024 / 1024).toFixed(2)} MB</p>}
             <label className="field-label" htmlFor="utr">UTR / transaction reference</label>
@@ -201,7 +199,7 @@ export default function RegisterPage() {
           </div>
         </form>)}
       </section>
-      <footer className="registration-footer"><span>AVISHKAR 2K26 · AIT CHIKKAMAGALURU</span><span>Need help? Contact a student coordinator above.</span></footer>
+      {!success && <footer className="registration-footer"><span>AVISHKAR 2K26 · AIT CHIKKAMAGALURU</span><span>Need help? Contact a student coordinator above.</span></footer>}
     </main>
   );
 }

@@ -93,6 +93,7 @@ export async function POST(request: Request) {
     registrationReference: result.registration_reference,
     domain: validated.domain.name,
     teamName: input.teamName.trim(),
+    teamLeaderPhone: input.leader.phone.trim(),
     status: "payment_pending",
     paymentStatus: "pending",
     registeredTeams: Number(result.registered_teams),
