@@ -25,6 +25,9 @@ export async function POST(request: Request) {
   if (turnstile === "unconfigured") {
     return NextResponse.json({ error: "Registration security verification is not configured. No registration was saved." }, { status: 503 });
   }
+  if (turnstile === "misconfigured") {
+    return NextResponse.json({ error: "Registration security verification is misconfigured. Please contact the organisers." }, { status: 503 });
+  }
   if (turnstile === "unavailable") {
     return NextResponse.json({ error: "Anti-spam verification is temporarily unavailable. Please try again." }, { status: 503 });
   }
