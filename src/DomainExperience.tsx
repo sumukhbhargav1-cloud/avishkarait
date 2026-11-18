@@ -1,5 +1,5 @@
 import { ArrowUpRight, Atom, Code2, Hammer, Radio, Shield } from 'lucide-react';
-import { eventDomains, type DomainChallenge, type EventDomain } from '@/lib/domain-content';
+import { IOT_PROBLEM_STATEMENT_RULE, eventDomains, type DomainChallenge, type EventDomain } from '@/lib/domain-content';
 import { registrationUrl } from '@/lib/portal-links.mjs';
 
 const icons = [Shield, Code2, Radio, Hammer, Atom];
@@ -22,6 +22,7 @@ export default function DomainExperience({ slug }: { slug?: string }) {
             <div className="experience-card-top"><span>{domain.number} / {domain.code}</span><Icon size={23} aria-hidden="true" /></div>
             <h3>{domain.name}</h3>
             <p>{domain.short}</p>
+            {domain.slug === 'iot-embedded' && <p className="iot-rule-highlight"><strong>{IOT_PROBLEM_STATEMENT_RULE}</strong></p>}
             <dl className="domain-contacts">
               {domain.coordinators.map(({ role, name, phone }) => (
                 <div key={role}>
@@ -40,7 +41,7 @@ export default function DomainExperience({ slug }: { slug?: string }) {
                   <p>{[teamSize(domain, challenge), challenge.duration ?? domain.duration].filter(Boolean).join(' · ')}</p>
                   <p>{challenge.summary}</p>
                   <h5>Requirements &amp; rules</h5>
-                  <ul>{challenge.requirements.map(item => <li key={item}>{item}</li>)}</ul>
+                  <ul>{challenge.requirements.map(item => <li key={item}>{item === IOT_PROBLEM_STATEMENT_RULE ? <strong>{item}</strong> : item}</li>)}</ul>
                   <h5>Evaluation</h5>
                   <ul>{challenge.evaluation.map(item => <li key={item}>{item}</li>)}</ul>
                 </section>

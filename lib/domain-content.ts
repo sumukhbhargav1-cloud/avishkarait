@@ -1,3 +1,5 @@
+export const IOT_PROBLEM_STATEMENT_RULE = 'The problem statement is open to participants. Each team must bring its own problem statement and build an IoT or embedded systems solution to address it during the hackathon.';
+
 export type DomainChallenge = {
   id: string;
   name: string;
@@ -115,7 +117,7 @@ export const eventDomains: EventDomain[] = [
     ],
     name: 'IoT & Embedded Systems',
     short: 'Connect software, sensing and the physical world.',
-    description: 'Build a complete connected or embedded project during the hackathon.',
+    description: 'Bring your own problem statement and build a complete connected or embedded solution during the hackathon.',
     minTeamSize: 2, maxTeamSize: 4,
     focus: ['Connected devices', 'Embedded systems', 'Intelligent sensing'],
     challenges: [{
@@ -124,6 +126,7 @@ export const eventDomains: EventDomain[] = [
       summary: 'Build and demonstrate a complete IoT or embedded hardware and software prototype.',
       minTeamSize: 2, maxTeamSize: 4,
       requirements: [
+        IOT_PROBLEM_STATEMENT_RULE,
         'Team size: 2 to 4 members.',
         'Participants must bring all required components, sensors, microcontrollers and hardware tools. The college will not provide components.',
         'Build the complete hardware and software prototype during the hackathon.',

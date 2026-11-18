@@ -290,3 +290,5 @@
 .domain-rules summary{cursor:pointer;font-weight:700}
 .domain-rules h4,.domain-rules h5{font-size:inherit;margin:12px 0 4px}
 .experience-actions>span{font-size:12px;font-weight:700}
+
+.iot-rule-highlight,.experience-card>p.iot-rule-highlight{background:#fff3d6;border-left:4px solid #b87500;padding:14px;color:#392800;font-size:14px;line-height:1.6;margin:14px 0;min-height:0}
