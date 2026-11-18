@@ -1,3 +1,5 @@
+import { IOT_PROBLEM_STATEMENT_RULE } from './domain-content';
+
 // ==============================================================================
 // STRICT DESIGN SYSTEM & BRAND CONSTANTS
 // No other colors or gradients are permitted anywhere across the application.
@@ -169,6 +171,7 @@ export const EVENT_DOMAINS: Record<string, EventDomain> = {
     teamSizeMax: 4,
     duration: '24 Hours',
     rules: [
+      IOT_PROBLEM_STATEMENT_RULE,
       'Team size: 2 to 4 members.',
       'Participants must bring all required components, sensors, microcontrollers and hardware tools.',
       'Components will not be provided by the college.',
