@@ -23,6 +23,7 @@ export type EventDomain = {
   minTeamSize?: number;
   maxTeamSize?: number;
   duration?: string;
+  registrationOpen: boolean;
   coordinators: { role: string; name: string; phone: string }[];
   challenges: DomainChallenge[];
 };
@@ -38,6 +39,7 @@ export const eventDomains: EventDomain[] = [
   // Duration: 24 hours (confirmed).
   {
     number: '01', code: 'CYB', slug: 'ai-cybersecurity-fintech',
+    registrationOpen: false,
     coordinators: [
       { role: 'Student Coordinator', name: 'Yogin', phone: '+91 6364328712' },
       { role: 'Faculty Coordinator', name: 'Ms. Nausheen', phone: '+91 8088153093' },
@@ -74,6 +76,7 @@ export const eventDomains: EventDomain[] = [
   // Duration: 24 hours (confirmed).
   {
     number: '02', code: 'FSD', slug: 'full-stack',
+    registrationOpen: false,
     coordinators: [
       { role: 'Student Coordinator', name: 'Likeeth G Urs', phone: '+91 9113688812' },
       { role: 'Faculty Coordinator', name: 'Ms Sana Ara', phone: '+91 9148845386' },
@@ -111,6 +114,7 @@ export const eventDomains: EventDomain[] = [
   // Build complete prototype during the event. No pre-built projects.
   {
     number: '03', code: 'IOT', slug: 'iot-embedded',
+    registrationOpen: false,
     coordinators: [
       { role: 'Student Coordinator', name: 'Divya P', phone: '+91 9380662076' },
       { role: 'Faculty Coordinator', name: 'Dr. Raghukumar B S', phone: '+91 91642 80757' },
@@ -147,6 +151,7 @@ export const eventDomains: EventDomain[] = [
   // PPE and workshop safety rules mandatory.
   {
     number: '04', code: 'MEC', slug: 'mechspark',
+    registrationOpen: true,
     coordinators: [
       { role: 'Student Coordinator', name: 'Kishan', phone: '+91 9964127576' },
       { role: 'Faculty Coordinator', name: 'Mr. Praveen', phone: '+91 8762006969' },
@@ -207,6 +212,7 @@ export const eventDomains: EventDomain[] = [
   //   SURVEYOR-X: exactly 4 members; participants bring calculator; practical levelling
   {
     number: '05', code: 'CIV', slug: 'theodo',
+    registrationOpen: true,
     coordinators: [
       { role: 'Student Coordinator', name: 'Rahul', phone: '+91 9110463448' },
       { role: 'Faculty Coordinator', name: 'Mr. Naveen', phone: '+91 95917 93656' },

@@ -49,8 +49,8 @@ export default function DomainExperience({ slug }: { slug?: string }) {
               <p>All participants must report with institutional ID at BGS Seminar Hall.</p>
             </details>
             <div className="experience-actions">
-              <span>Registration open</span>
-              <a className="button button-red" href={registrationUrl} aria-label={`Register for ${domain.name}`}>Register <ArrowUpRight size={14} /></a>
+              <span>{domain.registrationOpen ? 'Registration open' : 'Registration closed'}</span>
+              {domain.registrationOpen && <a className="button button-red" href={registrationUrl} aria-label={`Register for ${domain.name}`}>Register <ArrowUpRight size={14} /></a>}
             </div>
           </article>
         );
